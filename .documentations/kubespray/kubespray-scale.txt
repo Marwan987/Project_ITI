@@ -1,0 +1,31 @@
+# Adding a new node 
+# Add the new server inventory/iti-cluster/hosts.yml file In “[all]” section and In [kube-node] section
+vim inventory/iti-cluster/hosts.yml
+
+# add user k8s to the new server then Enable passwordless login to the new server  
+useradd -md /home/k8s -s /bin/bash k8s
+passwd k8s
+sudo echo 'k8s        ALL=(ALL)       NOPASSWD: ALL' >> /etc/sudoers
+mkdir .ssh
+vi .ssh/authorized_keys
+
+# to add worker nodes to the cluster 
+ansible-playbook -i inventory/iti-cluster/hosts.yml scale.yml -b -v \
+  --private-key=~/.ssh/id_rsa
+
+# to add master node, edit inventory/iti-cluster/hosts.yml then run  
+ansible-playbook -i inventory/iti-cluster/hosts.yml cluster.yml -b -v   --private-key=~/.ssh/id_rsa
+
+# to remove node2 "node2 can be master or worker" 
+ansible-playbook -i inventory/iti-cluster/hosts.yml remove-node.yml -b -v \
+--private-key=~/.ssh/id_rsa \
+--extra-vars "node=node2"
+
+
+
+
+
+
+
+
+
